@@ -8,12 +8,12 @@ export default class extends BaseSchema {
       table.increments('id')
 
       table.smallint('number').notNullable()
-      table.integer('title_id').notNullable()
+      table.string('title').notNullable()
       table.string('artist').notNullable()
       // duration in seconds
-      table.smallint('duration').notNullable()
+      table.integer('duration').notNullable()
       table.string('manifest_url').notNullable()
-      table.string('playlist_hls_url').notNullable()
+      table.string('playlist_url').notNullable()
       table.string('audio_128_url').notNullable()
       table.string('audio_192_url').notNullable()
       table.string('audio_256_url').notNullable()

@@ -9,7 +9,6 @@
 
   &-input-wrapper {
     position: relative;
-    border: 1px solid #FFF;
     border-radius: 3px;
   }
 
@@ -17,19 +16,11 @@
     width: 100%;
     padding: 20px 0 20px 50px;
     font-size: 16px;
-    color: var(--neutral-color-dark-2);
-    outline: var(--primary-color-light);
-    background: var(--neutral-color-soft-gray-3);
-    border: 1px solid var(--neutral-color-gray-2);
+    background: var(--color-surface-100);
+    color: var(--color-surface-700);
+    border: 1px solid #fff;
     border-radius: 3px;
-  }
-
-  &__input[data-autocompleted] {
-    background-color: transparent !important;
-  }
-
-  &__input:-webkit-autofill {
-    background-color: var(--color-surface-100)
+    outline-color: transparent;
   }
 
   &__icon {
@@ -43,6 +34,7 @@
 
   &__error {
     display: none;
+    margin: 0;
     font-size: 14px;
     font-weight: 500;
     color: var(--secondary-red-dark);

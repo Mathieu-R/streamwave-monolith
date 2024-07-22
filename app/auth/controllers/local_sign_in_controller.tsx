@@ -9,17 +9,17 @@ export default class LocalSignInController {
     return <SignIn />
   }
 
-  async store({ request, response, auth }: HttpContext) {
+  async store({ request, session, auth, response }: HttpContext) {
     const { email, password } = await request.validateUsing(loginValidator)
+    console.log(email, password)
 
     // check credentials
+    // note: if invalid credentials, check handler.ts
     const user = await User.verifyCredentials(email, password)
 
     // check email is verified
     if (!user.emailVerified) {
-      return response.unauthorized({
-        message: 'Account not validated. Please verify your e-mails.',
-      })
+      session.flash('email', 'Account not validated. Please verify your e-mails.')
     }
 
     // login the user

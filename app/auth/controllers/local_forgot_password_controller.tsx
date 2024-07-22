@@ -15,8 +15,6 @@ export default class LocalForgotPasswordController {
   async getResetToken({ request, response }: HttpContext, localAuthService: LocalAuthService) {
     const { email } = await request.validateUsing(getResetTokenValidator)
 
-    console.log(request.host(), request.hostname())
-
     // check if user exists
     const user = await User.query()
       .where((query) => {
@@ -28,7 +26,7 @@ export default class LocalForgotPasswordController {
       return response.noContent()
     }
 
-    await localAuthService.sendResetPasswordEmail(user)
+    await localAuthService.sendResetPasswordEmail(request.host()!, user)
 
     // flash message
     response.ok({

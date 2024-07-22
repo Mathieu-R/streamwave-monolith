@@ -1,6 +1,7 @@
-import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
+import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import User from '#models/user'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import Track from '#models/track'
 
 export default class Album extends BaseModel {
   @column({ isPrimary: true })
@@ -19,20 +20,23 @@ export default class Album extends BaseModel {
   declare genre: string
 
   @column()
-  declare cover_url: string
+  declare coverUrl: string
 
   @column()
-  declare primary_color_r: number
+  declare primaryColorR: number
 
   @column()
-  declare primary_color_g: number
+  declare primaryColorG: number
 
   @column()
-  declare primary_color_b: number
+  declare primaryColorB: number
 
   @column()
-  declare owner_id: number | null
+  declare ownerId: number | null
 
   @belongsTo(() => User)
-  declare User: BelongsTo<typeof User> | null
+  declare user: BelongsTo<typeof User> | null
+
+  @hasMany(() => Track)
+  declare tracks: HasMany<typeof Track>
 }

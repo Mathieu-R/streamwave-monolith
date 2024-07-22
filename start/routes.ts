@@ -52,7 +52,7 @@ router
 
 router
   .group(() => {
-    router.get('/library', [LibraryController, 'index']).as('home')
+    router.get('/', [LibraryController, 'index']).as('home')
   })
   .use(middleware.auth())
 

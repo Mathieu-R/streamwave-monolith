@@ -4,7 +4,7 @@ import LocalAuthService from '../services/local_auth_service.js'
 import { tokenValidator } from '../validators/local_auth.js'
 import User, { Provider } from '#models/user'
 import { DateTime } from 'luxon'
-import env from '#start/env'
+import AuthError from '#views/pages/errors/auth_error'
 
 export default class LocalValidationController {
   @inject()
@@ -17,22 +17,19 @@ export default class LocalValidationController {
       .where((query) => {
         return query
           .where('provider', Provider.LOCAL)
-          .where('emailVerificationToken', token)
-          .where('emailVerificationTokenExpiredAt', '>', DateTime.now().toSQLDate())
+          .andWhere('emailVerificationToken', token)
+          .andWhere('emailVerificationTokenExpiredAt', '>', DateTime.now().toSQLDate())
       })
       .first()
 
     // token does not exist or is expired
     if (!user) {
-      return response.unauthorized('This account verification token does not exist or is expired.')
+      const message = 'This account verification token does not exist or is expired.'
+      return <AuthError message={message} />
     }
 
     await localAuthService.validateAccount(user)
 
-    const url =
-      env.get('NODE_ENV') === 'production'
-        ? 'https://www.streamwave.be/auth/login'
-        : `http://localhost:${env.get('FRONT_PORT_DEV')}/auth/login`
-    return response.redirect(url)
+    return response.redirect().toPath('/sign-in')
   }
 }
