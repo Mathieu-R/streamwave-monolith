@@ -1,0 +1,60 @@
+.sign-in-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 450px;
+
+  h1 {
+    font-weight: 500;
+    color: var(--neutral-color-dark-1);
+  }
+
+  .forgot-password-link {
+    text-decoration: none;
+    text-align: center;
+    color: var(--color-surface-500);
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .no-account-link {
+    margin: 15px;
+
+    a:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .social-auth-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 400;
+    color: #FFF;
+
+    &--google::before {
+      content: '';
+      background: url('/resources/assets/svg/google.svg') no-repeat no-repeat;
+      background-size: 24px 24px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      margin-right: 10px;
+    }
+
+    &--github::before {
+      content: '';
+      background: url('/resources/assets/svg/github.svg') no-repeat no-repeat;
+      background-size: 24px 24px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      margin-right: 10px;
+    }
+  }
+}
+
+

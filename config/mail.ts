@@ -1,19 +1,19 @@
 import env from '#start/env'
 import { defineConfig, transports } from '@adonisjs/mail'
 
-const production = env.get("NODE_ENV") === "production"
+const production = env.get('NODE_ENV') === 'production'
 
 const mailConfig = defineConfig({
   default: 'smtp',
   from: {
-    address: "no-reply@streamwave.be",
-    name: "Streamwave"
+    address: 'no-reply@streamwave.be',
+    name: 'Streamwave',
   },
 
-   /**
-    * The mailers object can be used to configure multiple mailers
-    * each using a different transport or same transport with different
-    * options.
+  /**
+   * The mailers object can be used to configure multiple mailers
+   * each using a different transport or same transport with different
+   * options.
    */
   mailers: {
     smtp: transports.smtp({
@@ -21,7 +21,7 @@ const mailConfig = defineConfig({
       port: env.get('SMTP_PORT'),
       secure: production,
       ignoreTLS: !production,
-			/**
+      /**
        * Uncomment the auth block if your SMTP
        * server needs authentication
        */
@@ -31,7 +31,6 @@ const mailConfig = defineConfig({
         pass: env.get('SMTP_PASSWORD'),
       }*/
     }),
-
   },
 })
 

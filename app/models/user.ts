@@ -10,7 +10,9 @@ const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
 })
 
 export enum Provider {
-  LOCAL = "LOCAL", GOOGLE = "GOOGLE", GITHUB = "GITHUB"
+  LOCAL = 'LOCAL',
+  GOOGLE = 'GOOGLE',
+  GITHUB = 'GITHUB',
 }
 
 export default class User extends compose(BaseModel, AuthFinder) {

@@ -1,7 +1,7 @@
-import {BaseModel, belongsTo, column, manyToMany} from '@adonisjs/lucid/orm'
-import type {BelongsTo, ManyToMany} from "@adonisjs/lucid/types/relations";
-import Album from "#models/album";
-import Playlist from "#models/playlist";
+import { BaseModel, belongsTo, column, manyToMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, ManyToMany } from '@adonisjs/lucid/types/relations'
+import Album from '#models/album'
+import Playlist from '#models/playlist'
 
 export default class Track extends BaseModel {
   @column({ isPrimary: true })

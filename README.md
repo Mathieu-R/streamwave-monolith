@@ -1,10 +1,19 @@
-[![dependencies Status](https://david-dm.org/Mathieu-R/streamwave-api-ts/status.svg)](https://david-dm.org/Mathieu-R/streamwave-api-ts)
-
 # streamwave-monolith
 
-This is a merge and rework of the streamwave web app and APIs using AdonisJS, Inertia and React.
+6 years ago, I made a progressive web application called Streamwave. This was a full front-end app made with Preact and using multiple REST APIs for the back.
 
-### Legacy Web App 
+Despite the codebase being outdated, I notice lately that the way we most of the time build web applications these days (i.e. front-end framework + API) is not always needed. I would even say that it's overkill for a lot of projects and add unnecessary complexity (e.g. managing authentication on client side, duplication of routes on client side,...).
+
+The goal for this new project is to rework Streamwave as a SSR first application and adding web / preact components on top of it only when it's needed.
+
+### But does not building SPA with front-end framework allows better user experience (e.g. no page reload on view change) ?
+
+Well, in fact, you can have a similar SPA experience with SSR.
+Check for example [Unpoly](https://unpoly.com/) or [Hotwire](https://hotwired.dev/).
+
+We can now even have transitions between views using [View Transition API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API)
+
+### Legacy Web App
 
 - streamwave: https://github.com/Mathieu-R/streamwave
 
@@ -15,15 +24,17 @@ This is a merge and rework of the streamwave web app and APIs using AdonisJS, In
 
 What changed ?
 
-- Unified user table instead of splitting for local user and Google user.
+- Focus on desktop.
+- PostgreSQL instead of MongoDB.
 - Using session cookies instead of passing JWT to the request.
-- SSR with Inertia and Preact instead of separating the front-end and back-end.
+- SSR with TSX as template engine.
 
 ### Tech
 
 - [x] [AdonisJS](https://adonisjs.com/)
 - [x] [Lucid ORM](https://lucid.adonisjs.com/docs/introduction)
-- [x] [Inertia](https://inertiajs.com/)
+- [x] [TSX as template engine](https://adonisjs.com/blog/use-tsx-for-your-template-engine)
+- [x] [Preact](https://preactjs.com/)
 
 ### Usage
 
