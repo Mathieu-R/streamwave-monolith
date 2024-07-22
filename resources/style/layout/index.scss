@@ -1,0 +1,19 @@
+@import "navbar";
+@import "side_nav";
+
+.layout {
+  display: grid;
+  grid-template-rows: var(--header-height) 1fr;
+  height: 100%;
+}
+
+.form-only-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 450px;
+}
+
+
+

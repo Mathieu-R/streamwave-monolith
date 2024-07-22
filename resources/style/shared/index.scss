@@ -1,0 +1,37 @@
+@import "layout";
+
+.form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 20px;
+}
+
+.or-divider {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 50px;
+  margin: 0;
+  color: #FFF;
+
+  &::before,
+  &::after {
+    content: '';
+    display: block;
+    background: #FFF;
+    width: 100%;
+    height: 1px;
+    margin: auto 10px;
+  }
+}
+
+.divider {
+  display: block;
+  width: 90%;
+  align-self: center;
+  margin-block: 20px;
+  color: var(--neutral-color-soft-gray-3);
+  opacity: 0.3;
+}

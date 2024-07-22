@@ -1,3 +1,1 @@
-export class LibraryService {
-
-}
+export class LibraryService {}

@@ -7,12 +7,12 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').notNullable()
 
-      table.string("firstname").notNullable()
-      table.string("lastname").notNullable()
+      table.string('firstname').notNullable()
+      table.string('lastname').notNullable()
       table.string('email').notNullable()
       table.string('password').notNullable()
-      table.string("avatar_url").notNullable().defaultTo("/resources/assets/svg/avatar.svg")
-      table.enum("provider", ["LOCAL", "GOOGLE", "GITHUB"]).notNullable()
+      table.string('avatar_url').notNullable().defaultTo('/resources/assets/svg/avatar.svg')
+      table.enum('provider', ['LOCAL', 'GOOGLE', 'GITHUB']).notNullable()
 
       table.string('email_verification_token').nullable()
       table.timestamp('email_verification_token_expired_at').nullable()
@@ -25,7 +25,7 @@ export default class extends BaseSchema {
       table.timestamp('created_at').notNullable().defaultTo(this.now())
       table.timestamp('updated_at').notNullable().defaultTo(this.now())
 
-      table.unique(["email", "provider"])
+      table.unique(['email', 'provider'])
     })
   }
 

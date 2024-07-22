@@ -29,7 +29,8 @@
     "#database/*": "./database/*.js",
     "#tests/*": "./tests/*.js",
     "#start/*": "./start/*.js",
-    "#config/*": "./config/*.js"
+    "#config/*": "./config/*.js",
+    "#views/*": "./resources/views/*.js"
   },
   "devDependencies": {
     "@adonisjs/assembler": "^7.7.0",
@@ -42,13 +43,11 @@
     "@swc/core": "^1.5.24",
     "@types/luxon": "^3.4.2",
     "@types/node": "^20.13.0",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
     "eslint": "^8.57.0",
     "hot-hook": "^0.2.6",
     "pino-pretty": "^11.1.0",
     "prettier": "^3.3.0",
+    "sass": "^1.77.8",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
     "vite": "^5.2.12"
@@ -57,7 +56,7 @@
     "@adonisjs/ally": "^5.0.2",
     "@adonisjs/auth": "^9.2.1",
     "@adonisjs/core": "^6.9.1",
-    "@adonisjs/inertia": "^1.1.0",
+    "@adonisjs/i18n": "^2.1.0",
     "@adonisjs/lucid": "^20.6.0",
     "@adonisjs/mail": "^9.2.1",
     "@adonisjs/session": "^7.4.0",
@@ -65,13 +64,13 @@
     "@adonisjs/static": "^1.1.1",
     "@adonisjs/vite": "^3.0.0",
     "@inertiajs/react": "^1.2.0",
+    "@kitajs/html": "4.0.0-next.0",
+    "@kitajs/ts-html-plugin": "4.0.0-next.0",
     "@vinejs/vine": "^2.1.0",
     "edge.js": "^6.0.2",
     "luxon": "^3.4.4",
     "mjml": "^4.15.3",
     "pg": "^8.12.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
     "reflect-metadata": "^0.2.2"
   },
   "hotHook": {

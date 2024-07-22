@@ -54,5 +54,5 @@ export default await Env.create(new URL('../', import.meta.url), {
   GITHUB_CALLBACK_URL: Env.schema.string.optional(),
   GOOGLE_CLIENT_ID: Env.schema.string(),
   GOOGLE_CLIENT_SECRET: Env.schema.string(),
-  GOOGLE_CALLBACK_URL: Env.schema.string()
+  GOOGLE_CALLBACK_URL: Env.schema.string(),
 })

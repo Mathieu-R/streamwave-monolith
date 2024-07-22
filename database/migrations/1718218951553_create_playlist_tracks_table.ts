@@ -5,7 +5,12 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.integer('playlist_id').unsigned().references('id').inTable('playlists').onDelete('CASCADE')
+      table
+        .integer('playlist_id')
+        .unsigned()
+        .references('id')
+        .inTable('playlists')
+        .onDelete('CASCADE')
       table.integer('track_id').unsigned().references('id').inTable('tracks').onDelete('CASCADE')
 
       table.primary(['playlist_id', 'track_id'])

@@ -8,15 +8,15 @@ export default class extends BaseSchema {
       table.increments('id')
 
       table.smallint('number').notNullable()
-      table.integer("title_id").notNullable()
-      table.string("artist").notNullable()
+      table.integer('title_id').notNullable()
+      table.string('artist').notNullable()
       // duration in seconds
-      table.smallint("duration").notNullable()
-      table.string("manifest_url").notNullable()
-      table.string("playlist_hls_url").notNullable()
-      table.string("audio_128_url").notNullable()
-      table.string("audio_192_url").notNullable()
-      table.string("audio_256_url").notNullable()
+      table.smallint('duration').notNullable()
+      table.string('manifest_url').notNullable()
+      table.string('playlist_hls_url').notNullable()
+      table.string('audio_128_url').notNullable()
+      table.string('audio_192_url').notNullable()
+      table.string('audio_256_url').notNullable()
 
       table.integer('album_id').unsigned().references('id').inTable('albums').onDelete('CASCADE')
     })

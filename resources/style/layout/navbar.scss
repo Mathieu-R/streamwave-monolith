@@ -1,0 +1,15 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background: var(--color-surface-200);
+  font-size: 18px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+
+  &__title {
+    margin-block: 10px;
+    font-size: 22px;
+    font-weight: 500;
+  }
+}
