@@ -44,11 +44,16 @@ Prepare some media files you want to stream in the application.
 You can use the command line tool [metadatapp](https://github.com/Mathieu-R/metadatapp) to extract metadata and create necessary files needed for streaming.  
 Then, move the data folder at the root of this project.
 
-#### Generate Google OAuth2 secrets
+#### Generate Google and GitHub OAuth2 secrets
 
+**Google**    
 Go to https://console.cloud.google.com and create a new project.  
-Then go to APIs and services > Credentials then create an `OAuth 2.0 Client`. Take note of **Client ID**, **Client secret**.  
-You need to set the **Authorised JavaScript origins** to `http://localhost:3000` and **Authorised redirect URIs** to `http://localhost:3000/user/google/login/callback`.
+Then go to APIs and services > Credentials then create an `OAuth 2.0 Client`. Take note of **Client ID**, **Client secret**.    
+You need to set the **Authorised JavaScript origins** to `http://localhost:3000` and **Authorised redirect URIs** to `http://localhost:3000/login/google/callback`.
+
+**GitHub**    
+Go to https://github.com/settings/developers and create a new project. Take note of **Client ID**, **Client secret**.    
+Then set **Application Name**, **Homepage URL** to `http://localhost:3000` and **Authorization callback URL** to `http://localhost:3000/login/github/callback`.
 
 ### Set environment variables
 

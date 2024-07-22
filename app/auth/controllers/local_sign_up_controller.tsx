@@ -24,14 +24,14 @@ export default class LocalAuthController {
       .first()
 
     if (existingUser) {
-      return response.conflict({ message: 'User already exists' })
+      session.flash('email', 'User already exists')
     }
 
     // create the user (hash is handled by the model)
     const user = await localAuthService.createUser({ firstname, lastname, email, password })
 
     // send email verification
-    await localAuthService.sendVerificationEmail(user)
+    await localAuthService.sendVerificationEmail(request.host()!, user)
 
     // flash message
     session.flash({

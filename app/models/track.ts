@@ -20,22 +20,22 @@ export default class Track extends BaseModel {
   declare duration: number
 
   @column()
-  declare manifest_url: string
+  declare manifestUrl: string
 
   @column()
-  declare playlist_hls_url: string
+  declare playlistUrl: string
 
   @column()
-  declare audio_128_url: string
+  declare audio128Url: string
 
   @column()
-  declare audio_192_url: string
+  declare audio192Url: string
 
   @column()
-  declare audio_256_url: string
+  declare audio256Url: string
 
   @column()
-  declare album_id: number
+  declare albumId: number
 
   @belongsTo(() => Album)
   declare album: BelongsTo<typeof Album>

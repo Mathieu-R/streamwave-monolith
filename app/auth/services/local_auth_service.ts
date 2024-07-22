@@ -2,7 +2,6 @@ import crypto from 'node:crypto'
 import User, { Provider } from '#models/user'
 import { DateTime } from 'luxon'
 import mail from '@adonisjs/mail/services/main'
-import env from '#start/env'
 
 export default class LocalAuthService {
   // @ts-ignore
@@ -17,11 +16,8 @@ export default class LocalAuthService {
     })
   }
 
-  sendVerificationEmail(user: User) {
-    const url =
-      env.get('NODE_ENV') === 'production'
-        ? `https://api.streamwave.be/user/validate?token=${user.emailVerificationToken}`
-        : `http://localhost:${env.get('PORT')}/user/validate?token=${user.emailVerificationToken}`
+  sendVerificationEmail(host: string, user: User) {
+    const url = `${host}/validate?token=${user.emailVerificationToken}`
 
     // queue the email
     return mail.sendLater((message) => {
@@ -44,17 +40,14 @@ export default class LocalAuthService {
     return user.save()
   }
 
-  async sendResetPasswordEmail(user: User) {
+  async sendResetPasswordEmail(host: string, user: User) {
     const token = crypto.randomBytes(20).toString('hex')
 
     user.resetPasswordToken = token
     user.resetPasswordTokenExpiredAt = DateTime.now().plus({ hours: 1 })
     await user.save()
 
-    const url =
-      env.get('NODE_ENV') === 'production'
-        ? `https://api.streamwave.be/user/password/check-reset-token?token=${token}`
-        : `http://localhost:${env.get('PORT')}/user/password/check-reset-token?token=${token}`
+    const url = `${host}/reset-password/check-reset-token?token=${token}`
 
     // queue the email
     return mail.sendLater((message) => {
