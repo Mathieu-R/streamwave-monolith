@@ -4,6 +4,8 @@ import { csrfField, getFlashMessages, route } from '#start/view'
 
 export default function SignIn() {
   const flashMessages = getFlashMessages()
+  console.log(flashMessages.all())
+  console.log()
   return (
     <GuestLayout>
       <div class={'container--center'}>
@@ -17,7 +19,7 @@ export default function SignIn() {
               name={'email'}
               type={'email'}
               iconUrl={'resources/assets/svg/mail.svg'}
-              error={flashMessages.get('error')}
+              error={flashMessages.get('errors.email')}
             />
 
             <FormInput
@@ -25,7 +27,7 @@ export default function SignIn() {
               type={'password'}
               name={'password'}
               iconUrl={'resources/assets/svg/lock.svg'}
-              error={flashMessages.get('error')}
+              error={flashMessages.get('errors.password')}
             />
 
             <button class={'btn btn--primary'} type="submit">

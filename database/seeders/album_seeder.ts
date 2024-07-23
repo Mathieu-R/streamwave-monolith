@@ -1,8 +1,8 @@
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 
 import Album from '#models/album'
-import Track from '#models/track'
 
+// @ts-expect-error
 import colorthief from 'colorthief'
 import { parse } from 'csv-parse/sync'
 import fs from 'node:fs/promises'

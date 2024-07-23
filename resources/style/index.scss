@@ -1,18 +1,20 @@
 @import 'variables';
 
 // basic rules
-@import "reset";
+@import 'reset';
 @import 'global';
 
 // layout components
-@import "layout";
+@import 'layout';
 
 // shared classes
-@import "shared";
+@import 'shared';
 
 // components
-@import 'components/form';
+@import 'components';
 
 // pages
-@import "pages/auth/sign_up";
-@import "pages/auth/sign_in";
+@import 'pages/auth/sign_up';
+@import 'pages/auth/sign_in';
+@import 'pages/library';
+@import 'pages/tracklist';

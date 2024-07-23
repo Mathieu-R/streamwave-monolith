@@ -1,3 +1,12 @@
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+}
+
 a {
   text-decoration: none;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -6,4 +15,11 @@ a {
 ::placeholder {
   color: #fff;
   opacity: 0.5;
+}
+
+button {
+  background: none;
+  border: none;
+  outline-color: transparent;
+  cursor: pointer;
 }

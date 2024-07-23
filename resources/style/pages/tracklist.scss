@@ -1,5 +1,6 @@
 .tracklist {
   flex: 1;
+  max-height: calc(100% - var(--header-height) - var(--player-height));
   overflow-y: auto;
 
   &__infos {
@@ -37,7 +38,7 @@
     font-weight: bold;
     margin: 5px 0;
 
-    @media (max-width: $mobile) {
+    @media (max-width: var(--mobile)) {
       font-size: 18px;
     }
   }
@@ -47,7 +48,7 @@
     color: #d4d4d4;
     margin: 0;
 
-    @media (max-width: $mobile) {
+    @media (max-width: var(--mobile)) {
       font-size: 12px;
     }
   }
@@ -57,7 +58,7 @@
     align-items: center;
     font-size: 14px;
 
-    @media (max-width: $mobile) {
+    @media (max-width: var(--mobile)) {
       font-size: 10px;
     }
   }

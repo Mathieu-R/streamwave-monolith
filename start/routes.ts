@@ -10,8 +10,6 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 
-const LibraryController = () => import('#controllers/library_controller')
-
 const LocalSignUpController = () => import('../app/auth/controllers/local_sign_up_controller.js')
 const LocalSignInController = () => import('../app/auth/controllers/local_sign_in_controller.js')
 const LocalValidationController = () =>
@@ -22,6 +20,9 @@ const LocalResetPasswordController = () =>
   import('../app/auth/controllers/local_reset_password_controller.js')
 const GoogleAuthController = () => import('../app/auth/controllers/google_auth_controller.js')
 const CommonAuthController = () => import('../app/auth/controllers/common_auth_controller.js')
+
+const HomeController = () => import('../app/home/controllers/home_controller.js')
+const AlbumController = () => import('../app/album/controllers/album_controller.js')
 
 router
   .group(() => {
@@ -45,14 +46,15 @@ router
 
     router.get('/login/google', [GoogleAuthController, 'loginGoogle'])
     router.get('/login/google/callback', [GoogleAuthController, 'loginGoogleCallback'])
-
-    router.get('/logout', [CommonAuthController, 'logout'])
   })
   .use(middleware.guest())
 
 router
   .group(() => {
-    router.get('/', [LibraryController, 'index']).as('home')
+    router.get('/', [HomeController, 'index']).as('home')
+    router.get('/album/:id', [AlbumController, 'index']).as('album')
+
+    router.post('/logout', [CommonAuthController, 'logout']).as('auth.logout')
   })
   .use(middleware.auth())
 

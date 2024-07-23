@@ -6,7 +6,7 @@
 .btn--primary {
   padding: 16px;
   background: var(--color-primary-100);
-  color: #FFF;
+  color: #fff;
   border: none;
   border-radius: 3px;
   box-shadow: 0 0 2px var(--color-primary-100);
@@ -17,19 +17,17 @@
   padding: 10px 12px;
   background: var(--color-surface-100);
   font-size: 18px;
-  border: 1px solid #FFF;
+  border: 1px solid #fff;
   border-radius: 10px;
 }
 
 .btn--third {
-  width: 100%;
   padding: 10px 12px;
-  background: var(--neutral-color-soft-gray-2);
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--neutral-color-gray-1);
+  background: none;
+  color: #fff;
+  font-size: 18px;
   border: none;
-  border-radius: 20px;
+  border-radius: 10px;
 }
 
 .btn--active {

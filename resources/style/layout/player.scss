@@ -1,0 +1,64 @@
+.player {
+  display: grid;
+  grid-template-columns: 25% 1fr 25%;
+  gap: 20px;
+  padding: 15px;
+  background: #000;
+
+  &__track-infos {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__track-cover {
+    height: 84px;
+    width: 84px;
+  }
+
+  &__track-title {
+    margin: 5px 0;
+  }
+
+  &__track-artist {
+    margin: 0;
+    font-size: 14px;
+    color: var(--color-surface-700);
+  }
+
+  &__controls-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  &__controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+
+    img {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  &__shuffle img,
+  &__repeat img {
+    width: 24px;
+    height: 24px;
+  }
+
+  &__play img {
+    width: 42px;
+    height: 42px;
+  }
+
+  &__aside-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+}

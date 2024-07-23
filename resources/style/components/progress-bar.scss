@@ -1,11 +1,10 @@
-$progress-bar-height: 8px;
-
 .progress-bar {
   position: relative;
   display: flex;
   align-items: center;
   flex: 1;
   height: 100%;
+  --progress-bar-height: 8px;
 
   &--radius {
     border-radius: 5px;
@@ -15,7 +14,7 @@ $progress-bar-height: 8px;
     position: absolute;
     top: 50%;
     left: 50%;
-    height: $progress-bar-height;
+    height: var(--progress-bar-height);
     width: 100%;
     transform: translate(-50%, -50%);
     background: rgba(255, 255, 255, 0.5);
@@ -26,7 +25,7 @@ $progress-bar-height: 8px;
     top: 50%;
     left: 50%;
     width: 100%;
-    height: $progress-bar-height;
+    height: var(--progress-bar-height);
     background: #fff;
     transform: translate(-50%, -50%) scale(0);
     transform-origin: 0 50%;

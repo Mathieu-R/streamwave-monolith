@@ -8,7 +8,7 @@ html,
 body {
   font-family: 'DM Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   background: var(--color-surface-100);
-  color: #FFF;
+  color: #fff;
   font-size: 16px;
   font-weight: 500;
   height: 100vh;
@@ -39,6 +39,7 @@ body {
 
 .overlay.overlay--visible {
   pointer-events: auto;
+
   &::before {
     opacity: 1;
   }
@@ -67,13 +68,4 @@ body {
 
 .ripple.expanded {
   transform: translate(50%, -50%) scale(1);
-}
-
-@keyframes fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }

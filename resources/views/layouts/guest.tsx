@@ -23,7 +23,7 @@ export default function GuestLayout({ children }: Props) {
         </head>
 
         <body>
-          <div class="layout">
+          <div class="layout layout--guest">
             <NavBar />
             {children}
           </div>

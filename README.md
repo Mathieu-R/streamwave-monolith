@@ -34,7 +34,7 @@ What changed ?
 - [x] [AdonisJS](https://adonisjs.com/)
 - [x] [Lucid ORM](https://lucid.adonisjs.com/docs/introduction)
 - [x] [TSX as template engine](https://adonisjs.com/blog/use-tsx-for-your-template-engine)
-- [x] [Preact](https://preactjs.com/)
+- [x] [LIT](https://lit.dev/)
 
 ### Usage
 

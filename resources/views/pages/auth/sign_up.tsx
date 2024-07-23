@@ -19,7 +19,7 @@ export default function SignUp() {
               name={'firstname'}
               type={'text'}
               iconUrl={'resources/assets/svg/user.svg'}
-              error={flashMessages.get('firstname')}
+              error={flashMessages.get('errors.firstname')}
             />
 
             <FormInput
@@ -27,7 +27,7 @@ export default function SignUp() {
               name={'lastname'}
               type={'text'}
               iconUrl={'resources/assets/svg/user.svg'}
-              error={flashMessages.get('lastname')}
+              error={flashMessages.get('errors.lastname')}
             />
 
             <FormInput
@@ -35,7 +35,7 @@ export default function SignUp() {
               name={'email'}
               type={'email'}
               iconUrl={'resources/assets/svg/mail.svg'}
-              error={flashMessages.get('email')}
+              error={flashMessages.get('errors.email')}
             />
 
             <FormInput
@@ -43,7 +43,7 @@ export default function SignUp() {
               type={'password'}
               name={'password'}
               iconUrl={'resources/assets/svg/lock.svg'}
-              error={flashMessages.get('password')}
+              error={flashMessages.get('errors.password')}
             />
 
             <FormInput
@@ -51,7 +51,7 @@ export default function SignUp() {
               type={'password'}
               name={'password_confirmation'}
               iconUrl={'resources/assets/svg/lock.svg'}
-              error={flashMessages.get('password_confirmation')}
+              error={flashMessages.get('errors.password_confirmation')}
             />
 
             <button class={'btn btn--primary'} type="submit">

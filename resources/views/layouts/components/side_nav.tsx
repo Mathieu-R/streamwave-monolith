@@ -22,11 +22,11 @@ export default function SideNav(props: Props) {
       </div>
       <ul class="side-nav__menu">
         <li class="side-nav__element">
-          <a class="side-nav__link" href="/" aria-label="library">
+          <a class="side-nav__link" href="/" up-target={'.library'} aria-label="library">
             <Vite.Image
               class={'side-nav__link-icon'}
               src="resources/assets/svg/library.svg"
-              alt={'library'}
+              alt={'home'}
             />
             Library
           </a>

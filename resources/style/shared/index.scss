@@ -1,4 +1,4 @@
-@import "layout";
+@import 'layout';
 
 .form {
   display: flex;
@@ -14,13 +14,13 @@
   width: 100%;
   height: 50px;
   margin: 0;
-  color: #FFF;
+  color: #fff;
 
   &::before,
   &::after {
     content: '';
     display: block;
-    background: #FFF;
+    background: #fff;
     width: 100%;
     height: 1px;
     margin: auto 10px;

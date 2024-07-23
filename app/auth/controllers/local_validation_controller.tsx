@@ -9,6 +9,7 @@ import AuthError from '#views/pages/errors/auth_error'
 export default class LocalValidationController {
   @inject()
   async execute({ request, response }: HttpContext, localAuthService: LocalAuthService) {
+    console.log('DEBUG')
     const qs = request.qs()
     const { token } = await tokenValidator.validate(qs)
 

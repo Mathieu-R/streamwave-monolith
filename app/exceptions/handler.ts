@@ -37,12 +37,12 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    */
   async handle(error: unknown, ctx: HttpContext) {
     if (error instanceof authErrors.E_INVALID_CREDENTIALS) {
-      ctx.session.flash('error', 'Invalid credentials')
+      ctx.session.flash('errors', {
+        email: 'Invalid credentials',
+        password: 'Invalid credentials',
+      })
     }
-
-    await super.handle(error, ctx)
-    console.log(ctx.session.flashMessages.all())
-    return
+    return super.handle(error, ctx)
   }
 
   /**

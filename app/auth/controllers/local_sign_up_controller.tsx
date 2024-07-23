@@ -24,7 +24,7 @@ export default class LocalAuthController {
       .first()
 
     if (existingUser) {
-      session.flash('email', 'User already exists')
+      session.flash('errors', { email: 'User already exists' })
     }
 
     // create the user (hash is handled by the model)

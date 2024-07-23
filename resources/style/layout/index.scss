@@ -1,10 +1,18 @@
-@import "navbar";
-@import "side_nav";
+@import 'navbar';
+@import 'side_nav';
+@import 'player';
 
 .layout {
   display: grid;
-  grid-template-rows: var(--header-height) 1fr;
   height: 100%;
+
+  &--guest {
+    grid-template-rows: var(--header-height) 1fr;
+  }
+
+  &--user {
+    grid-template-rows: var(--header-height) 1fr var(--player-height);
+  }
 }
 
 .form-only-wrapper {
@@ -14,6 +22,3 @@
   width: 100%;
   max-width: 450px;
 }
-
-
-
