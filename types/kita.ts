@@ -1,6 +1,7 @@
 declare global {
   namespace JSX {
     interface IntrinsicElements {
+      ['stw-library']: HtmlTag
       ['stw-tracklist']: HtmlTag
       ['stw-download-switch']: HtmlTag
       ['stw-track']: HtmlTag
@@ -10,10 +11,15 @@ declare global {
     }
 
     interface HtmlTag {
+      // unpoly
       ['up-main']?: boolean
       ['up-hungry']?: boolean
+      ['up-keep']?: boolean
       ['up-source']?: string
       ['load-fragment']?: boolean
+
+      // custom elements
+      ['cdn']?: string
     }
 
     interface HtmlAnchorTag {

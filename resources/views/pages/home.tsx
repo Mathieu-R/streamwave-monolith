@@ -16,13 +16,13 @@ export default function Home(props: Props) {
 
   return (
     <UserLayout user={user}>
-      <div class="library">
+      <stw-library class="library">
         <section class="library__inner">
           {albums.map((album) => (
             <Cover album={album} />
           ))}
         </section>
-      </div>
+      </stw-library>
     </UserLayout>
   )
 }

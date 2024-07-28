@@ -28,12 +28,17 @@ What changed ?
 - PostgreSQL instead of MongoDB.
 - Using session cookies instead of passing JWT to the request.
 - SSR with TSX as template engine.
+- Using Unpoly for SPA experience.
+- Using LIT for web components.
+- Global state management with signals.
+- Remove APIs that are still not widely supported by browsers.
 
 ### Tech
 
 - [x] [AdonisJS](https://adonisjs.com/)
 - [x] [Lucid ORM](https://lucid.adonisjs.com/docs/introduction)
 - [x] [TSX as template engine](https://adonisjs.com/blog/use-tsx-for-your-template-engine)
+- [x] [Unpoly](https://unpoly.com/)
 - [x] [LIT](https://lit.dev/)
 
 ### Usage
@@ -42,7 +47,7 @@ What changed ?
 
 Prepare some media files you want to stream in the application.  
 You can use the command line tool [metadatapp](https://github.com/Mathieu-R/metadatapp) to extract metadata and create necessary files needed for streaming.  
-Then, move the data folder at the root of this project.
+Then, move the data folder in the `cdn` folder.
 
 #### Generate Google and GitHub OAuth2 secrets
 

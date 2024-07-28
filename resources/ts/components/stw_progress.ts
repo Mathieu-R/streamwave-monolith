@@ -1,8 +1,12 @@
 import { css, html, LitElement } from 'lit'
-import { customElement, property } from 'lit/decorators.js'
+import { customElement } from 'lit/decorators.js'
+import { classMap } from 'lit/directives/class-map.js'
+import player from '../store/player/signals.js'
+import { SignalWatcher, effect } from '@lit-labs/preact-signals'
+import { formatDuration } from '#ts/helpers'
 
 @customElement('stw-progress')
-export default class STWProgress extends LitElement {
+export default class STWProgress extends SignalWatcher(LitElement) {
   static styles = css`
     :host {
       display: flex;
@@ -17,7 +21,14 @@ export default class STWProgress extends LitElement {
       display: flex;
       align-items: center;
       flex: 1;
+      gap: 10px;
       height: 100%;
+    }
+
+    .player__current_time,
+    .player__total_time {
+      width: 30px;
+      font-size: 12px;
     }
 
     .progress-bar {
@@ -27,6 +38,10 @@ export default class STWProgress extends LitElement {
       flex: 1;
       height: 100%;
       border-radius: 5px;
+    }
+
+    .progress-bar--disabled {
+      opacity: 0;
     }
 
     .progress-bar__track {
@@ -83,14 +98,12 @@ export default class STWProgress extends LitElement {
   `
   private bcr: null | DOMRect
   private dragging: boolean
-  private clampedPosition: null | number
 
   constructor() {
     super()
 
     this.bcr = null
     this.dragging = false
-    this.clampedPosition = null
 
     this.onResize = this.onResize.bind(this)
     this.updatePosition = this.updatePosition.bind(this)
@@ -126,16 +139,23 @@ export default class STWProgress extends LitElement {
     document.addEventListener('mousemove', this.onSwipeMove, { passive: true })
     document.addEventListener('mouseup', this.onSwipeEnd, { passive: true })
     window.addEventListener('resize', this.onResize)
+  }
+
+  firstUpdated() {
     this.onResize()
   }
 
-  onResize() {
-    // TODO: this is null on first render and not null when moving the window to trigger the resize event
-    if (!this._progressBar) {
+  updated(updatedProperties) {
+    // no track set
+    if (!player.currentTrack.value) {
       return
     }
+    const position = player.currentTime.value / player.currentTrack.value.duration!
+    requestAnimationFrame(() => this.updateUI(position))
+  }
 
-    this.bcr = this._progressBar.getBoundingClientRect()
+  onResize() {
+    this.bcr = this._progressBar!.getBoundingClientRect()
   }
 
   findCandidate(evt: TouchEvent) {
@@ -152,6 +172,10 @@ export default class STWProgress extends LitElement {
 
   onSwipeStart(evt: TouchEvent | MouseEvent) {
     evt.stopPropagation()
+
+    if (!player.active.value) {
+      return
+    }
 
     // focus on seeker element
     this._seekerContainer!.focus()
@@ -179,8 +203,7 @@ export default class STWProgress extends LitElement {
     this.dragging = false
     this._seeker!.classList.remove('progress-bar__seeker--active')
 
-    const currentTime = this.updatePosition(evt)
-    // TODO: seek the audio to the new position (dispatch event)
+    player.currentTime.value = this.updatePosition(evt)
   }
 
   updatePosition(evt: TouchEvent | MouseEvent) {
@@ -193,9 +216,10 @@ export default class STWProgress extends LitElement {
     // ensure we do not go outside the progress bar
     const clampedPositionX = Math.max(0, Math.min(relativePositionX, 1))
 
-    // TODO: get the current time from the clamped position
-
     requestAnimationFrame(() => this.updateUI(clampedPositionX))
+
+    // get the current time from the clamped position
+    return Math.floor(clampedPositionX * player.currentTrack.value.duration!)
   }
 
   updateUI(clampedPositionX: number) {
@@ -215,15 +239,19 @@ export default class STWProgress extends LitElement {
   protected render() {
     return html`
       <div class="wrapper" @mousedown="${this.onSwipeStart}" @touchstart="${this.onSwipeStart}">
-        <div class="player__current_time"></div>
-        <div class="progress-bar">
+        <div class="player__current_time">
+          ${player.active.value ? formatDuration(player.currentTime.value) : ''}
+        </div>
+        <div class="progress-bar ${classMap({ 'progress-bar--disabled': !player.active.value })}">
           <div class="progress-bar__track"></div>
           <div class="progress-bar__track-used"></div>
           <div class="progress-bar__seeker-container">
             <div class="progress-bar__seeker"></div>
           </div>
         </div>
-        <div class="player__total_time"></div>
+        <div class="player__total_time">
+          ${player.currentTrack.value ? formatDuration(player.currentTrack.value.duration!) : ''}
+        </div>
       </div>
     `
   }

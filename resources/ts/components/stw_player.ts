@@ -1,10 +1,20 @@
 import { LitElement, html, css } from 'lit'
-import { customElement } from 'lit/decorators.js'
+import { customElement, property, state } from 'lit/decorators.js'
+import { ifDefined } from 'lit/directives/if-defined.js'
+import { SignalWatcher, effect } from '@lit-labs/preact-signals'
+// @ts-expect-error
+import shaka from 'shaka-player'
+
+import player from '../store/player/signals.js'
+import { switchPlayingStatus } from '../store/player/mutations.js'
+
+import Constants from '../constants.js'
 
 import './stw_progress.js'
+import { Track } from '#types/signals'
 
 @customElement('stw-player')
-export default class STWPlayer extends LitElement {
+export default class STWPlayer extends SignalWatcher(LitElement) {
   static styles = css`
     :host {
       display: grid;
@@ -78,37 +88,203 @@ export default class STWPlayer extends LitElement {
     }
   `
 
+  @property({ type: String })
+  cdn!: string
+
+  @property({ type: Object })
+  player: shaka.Player | null
+
+  @property({ type: Object })
+  castProxy: shaka.cast.CastProxy | null
+
+  @property({ type: Object })
+  remoteAudio: HTMLAudioElement | null
+
+  @property({ type: Object })
+  remotePlayer: shaka.Player | null
+
+  @state()
+  currentTrack: Track | null
+
+  constructor() {
+    super()
+
+    this.player = null
+    this.castProxy = null
+
+    this.remoteAudio = null
+    this.remotePlayer = null
+
+    this.currentTrack = null
+
+    this.trackTimeUpdate = this.trackTimeUpdate.bind(this)
+  }
+
+  // called when shadow dom is first rendered
+  firstUpdated() {
+    console.log('PLAYER: first render')
+    this.initShakaPlayer()
+
+    // listen to queue point index changes
+    player.queuePointerIndex.subscribe((pointer) => {
+      if (!pointer) {
+        return
+      }
+
+      const queue = player.queue.value
+      const trackId = queue[pointer]
+      const track = player.tracklist.value!.get(trackId)!
+
+      this.listen(track, true)
+        .then(() => {
+          this.currentTrack = track
+        })
+        .catch((err: Error) => {
+          this.player!.unload()
+          console.error(err)
+        })
+    })
+  }
+
+  get audio() {
+    return this.shadowRoot!.querySelector('.audio') as HTMLAudioElement
+  }
+
+  async initShakaPlayer() {
+    shaka.polyfill.installAll()
+
+    if (!shaka.Player.isBrowserSupported()) {
+      console.error('Browser not supported by shaka-player...')
+      return
+    }
+
+    this.player = new shaka.Player()
+    await this.player.attach(this.audio)
+
+    this.castProxy = new shaka.cast.CastProxy(this.audio, this.player, Constants.PRESENTATION_ID)
+    this.remoteAudio = this.castProxy.getVideo()
+    this.remotePlayer = this.castProxy.getPlayer()
+
+    // track time update
+    requestAnimationFrame(this.trackTimeUpdate)
+
+    // player accessible anywhere
+    // @ts-expect-error
+    window.player = this.player
+
+    // player event listeners
+    this.playerEventListeners()
+  }
+
+  playerEventListeners() {
+    this.player.addEventListener('error', (evt: any) => {
+      console.error('Shaka player error')
+      evt.detail.map((err: Error) => console.error(err))
+    })
+  }
+
+  initWebAudioApi() {}
+
+  async listen(track: Track, play: boolean) {
+    if (!this.remotePlayer) {
+      return
+    }
+
+    await this.remotePlayer.load(`${this.cdn}/${track.manifest}`)
+
+    console.log(`[shaka-player] Music loaded: ${track.manifest}`)
+    return play ? await this.play() : await this.pause()
+
+    // TODO: media session notification
+  }
+
+  play() {
+    this.remoteAudio?.play()
+  }
+
+  pause() {
+    this.remoteAudio?.pause()
+  }
+
+  trackTimeUpdate() {
+    if (!this.remoteAudio) {
+      return
+    }
+
+    const { duration, currentTime: remoteAudioCurrentTime } = this.remoteAudio
+    requestAnimationFrame(this.trackTimeUpdate)
+
+    if (!duration) {
+      return
+    }
+
+    if (this.remoteAudio.paused) {
+      return
+    }
+
+    player.currentTime.value = Math.floor(remoteAudioCurrentTime)
+  }
+
+  seek(time: number) {
+    this.remoteAudio!.currentTime = time
+  }
+
+  onPlayPauseClick() {
+    const isPlaying = player.status.playing.value
+
+    // switch playing status
+    switchPlayingStatus()
+
+    isPlaying ? this.pause() : this.play()
+  }
+
+  onPrevClick() {
+    const currentTime = this.audio!.currentTime
+
+    // if media has been listened for more than 2 seconds, go back to the beginning
+    if (currentTime > 2) {
+      this.seek(0)
+      return
+    }
+  }
+
+  renderPlayPause() {
+    return player.status.playing.value
+      ? html`<img src="/resources/assets/svg/pause.svg" alt="pause" />`
+      : html`<img src="/resources/assets/svg/play.svg" alt="play" />`
+  }
+
   render() {
     return html`
       <div class='player__track-infos'>
-        <img class="player__track-cover" alt="cover"/>
+        <img class="player__track-cover" src=${this.cdn}/${ifDefined(this.currentTrack?.coverUrl)} alt="cover"/>
         <div>
-          <p class="player__track-title">Jules Vern on the moon</p>
-          <p class="player__track-artist">Ad Hoc Wind Orchestra</p>
+          <p class="player__track-title">${this.currentTrack?.title}</p>
+          <p class="player__track-artist">${this.currentTrack?.artist}</p>
         </div>
       </div>
       <div class="player__controls-wrapper">
         <div class='player__controls'>
-          <button class="player__repeat">
-            <img src='/resources/assets/svg/repeat.svg' alt="repeat"/>
-          </button>
           <button class="player__shuffle">
             <img src='/resources/assets/svg/shuffle.svg' alt="shuffle"/>
           </button>
           <button class="player__seek_backward">
             <img src='/resources/assets/svg/seek_backward.svg' alt="seek backward"/>
           </button>
-          <button class="player__previous">
+          <button class="player__previous" @click="${this.onPrevClick}">
             <img src='/resources/assets/svg/previous.svg' alt="previous"/>
           </button>
-          <button class="player__play">
-            <img src='/resources/assets/svg/play.svg' alt="play"/>
+          <button class="player__play" @click="${this.onPlayPauseClick}">
+            ${this.renderPlayPause()}
           </button>
           <button class="player__next">
             <img src='/resources/assets/svg/next.svg' alt="next"/>
           </button>
           <button class="player__seek_forward">
             <img src='/resources/assets/svg/seek_forward.svg' alt="seek forward"/>
+          </button>
+          <button class="player__repeat">
+            <img src='/resources/assets/svg/repeat.svg' alt="repeat"/>
           </button>
         </div>
         <stw-progress class='player__progress-bar progress-bar'></stw-progress>
@@ -120,6 +296,7 @@ export default class STWPlayer extends LitElement {
         </button>
         <stw-volume class="player__volume"></stw-volume>
       </div>
+      <audio class="audio" preload="metadata"/>
     `
   }
 }

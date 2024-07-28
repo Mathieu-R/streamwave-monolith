@@ -30,7 +30,9 @@
     "#tests/*": "./tests/*.js",
     "#start/*": "./start/*.js",
     "#config/*": "./config/*.js",
-    "#views/*": "./resources/views/*.js"
+    "#views/*": "./resources/views/*.js",
+    "#ts/*": "./resources/ts/*.js",
+    "#types/*": "./types/*.js"
   },
   "devDependencies": {
     "@adonisjs/assembler": "^7.7.0",
@@ -69,6 +71,7 @@
     "@inertiajs/react": "^1.2.0",
     "@kitajs/html": "4.0.0-next.0",
     "@kitajs/ts-html-plugin": "4.0.0-next.0",
+    "@lit-labs/preact-signals": "^1.0.2",
     "@vinejs/vine": "^2.1.0",
     "colorthief": "^2.4.0",
     "edge.js": "^6.0.2",
@@ -77,7 +80,7 @@
     "mjml": "^4.15.3",
     "pg": "^8.12.0",
     "reflect-metadata": "^0.2.2",
-    "shaka-player": "^4.10.8",
+    "shaka-player": "^4.8.1",
     "unpoly": "^3.8.0"
   },
   "hotHook": {

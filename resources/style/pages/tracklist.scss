@@ -1,6 +1,6 @@
 .tracklist {
   flex: 1;
-  max-height: calc(100% - var(--header-height) - var(--player-height));
+  //max-height: calc(100% - var(--header-height) - var(--player-height));
   overflow-y: auto;
 
   &__infos {
@@ -9,11 +9,12 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 150px;
 
     &-wrapper {
       display: flex;
+      align-items: center;
       width: 100%;
+      padding: 0 10px;
     }
   }
 

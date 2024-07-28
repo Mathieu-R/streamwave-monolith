@@ -3,6 +3,7 @@ import { Vite } from '#start/view'
 import { PropsWithChildren } from '@kitajs/html'
 import NavBar from '#views/layouts/components/navbar'
 import SideNav from '#views/layouts/components/side_nav'
+import env from '#start/env'
 
 type Props = PropsWithChildren<{
   user: any
@@ -31,7 +32,7 @@ export default function UserLayout(props: Props) {
               <SideNav user={user} />
               {children}
             </div>
-            <stw-player class="player"></stw-player>
+            <stw-player class="player" cdn={env.get('CDN_URL')}></stw-player>
           </div>
         </body>
       </html>

@@ -7,6 +7,9 @@
     "jsxFactory": "Html.createElement",
     "jsxFragmentFactory": "Html.Fragment",
     "plugins": [{ "name": "@kitajs/ts-html-plugin" }],
-    "lib": ["esnext", "dom"],
+    "experimentalDecorators": true, // lit
+    "useDefineForClassFields": false, // lit
+    "lib": ["esnext", "dom"], // to use window object in web-components
+    "skipLibCheck": true // for shaka-player patch
   }
 }

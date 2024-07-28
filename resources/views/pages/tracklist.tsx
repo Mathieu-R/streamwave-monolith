@@ -1,10 +1,11 @@
-import { pluralize } from '#start/view'
+import { pluralize } from '#ts/helpers'
 import { AlbumQueryResult } from '../../../app/album/repositories/album_repository.js'
 
 import Switch from '#views/components/switch'
 import Track from '#views/components/track'
 import UserLayout from '#views/layouts/user'
 import { HttpContext } from '@adonisjs/core/http'
+import env from '#start/env'
 
 interface Props {
   album: AlbumQueryResult
@@ -13,16 +14,17 @@ interface Props {
 
 export default function TrackListPage(props: Props) {
   const { auth } = HttpContext.getOrFail()
+  const cdnUrl = env.get('CDN_URL')
   const user = auth.user!
 
   const { album, type } = props
   return (
     <UserLayout user={user}>
-      <stw-tracklist class="tracklist">
+      <stw-tracklist class="tracklist" tracklistid={`${type}-${album.id}`}>
         <section class="tracklist__infos">
           <div class="tracklist__infos-wrapper">
             {album.coverUrl && (
-              <img class="tracklist__cover" alt="cover" src={`${album.coverUrl}`} />
+              <img class="tracklist__cover" alt="cover" src={`${cdnUrl}/${album.coverUrl}`} />
             )}
             <div class="tracklist__details">
               <div class="tracklist__title">{album.title}</div>
@@ -49,8 +51,8 @@ export default function TrackListPage(props: Props) {
           </div>
         </section>
         <section class="tracklist__tracks">
-          {album.tracks.map((track) => (
-            <Track track={track} type={type} />
+          {album.tracks.map((track, idx) => (
+            <Track index={idx} track={track} coverUrl={album.coverUrl} type={type} />
           ))}
         </section>
       </stw-tracklist>
