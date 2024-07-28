@@ -1,5 +1,7 @@
 # streamwave-monolith
 
+![streamwave-tracklist](screenshots/capture-1.png)
+
 6 years ago, I made a progressive web application called Streamwave. This was a full front-end app made with Preact and using multiple REST APIs for the back.
 
 Despite the codebase being outdated, I notice lately that the way we most of the time build web applications these days (i.e. front-end framework + API) is not always needed. I would even say that it's overkill for a lot of projects and add unnecessary complexity (e.g. managing authentication on client side, duplication of routes on client side,...).

@@ -38,6 +38,7 @@ export default class STWTrack extends LitElement {
       const tracklistMap = new Map(
         Array.from(tracklist.querySelectorAll('stw-track'))!.map((track) => {
           const trackInfos = {
+            index: Number.parseInt(track.getAttribute('index')!),
             title: track.getAttribute('title')!,
             artist: track.getAttribute('artist')!,
             duration: Number.parseInt(track.getAttribute('duration')!),

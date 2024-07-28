@@ -1,4 +1,5 @@
 export interface Track {
+  index: number
   title: string
   artist: string
   duration: number

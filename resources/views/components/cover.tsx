@@ -7,7 +7,6 @@ export interface Props {
 export default function Cover(props: Props) {
   const { album } = props
   const cdnUrl = env.get('CDN_URL')
-  console.log(album)
   const { id, title, artist, coverUrl, primaryColorR, primaryColorG, primaryColorB } = album
   return (
     <div class="cover">

@@ -6,7 +6,13 @@ import { SignalWatcher } from '@lit-labs/preact-signals'
 import shaka from 'shaka-player'
 
 import player from '../store/player/signals.js'
-import { setCurrentTime, switchPlayingStatus } from '../store/player/mutations.js'
+import {
+  setCurrentTime,
+  switchPlayingStatus,
+  setPrevTrack,
+  setNextTrack,
+  toggleShuffle,
+} from '../store/player/mutations.js'
 
 import Constants from '../constants.js'
 
@@ -70,8 +76,8 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
       }
     }
 
-    .player__shuffle img,
-    .player__repeat img {
+    .player__shuffle svg,
+    .player__repeat svg {
       width: 24px;
       height: 24px;
     }
@@ -79,6 +85,13 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
     .player__play img {
       width: 42px;
       height: 42px;
+    }
+
+    .player__play[disabled],
+    .player__previous[disabled],
+    .player__next[disabled] {
+      opacity: 0.5;
+      cursor: default;
     }
 
     .player__aside-wrapper {
@@ -107,7 +120,7 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
   tracking: boolean
 
   @property()
-  audio: HTMLAudioElement
+  skipTime: number
 
   @state()
   currentTrack: Track | null
@@ -123,9 +136,14 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
 
     this.currentTrack = null
     this.tracking = false
-    this.audio = document.querySelector('.audio')!
+
+    this.skipTime = 15
 
     this.trackTimeUpdate = this.trackTimeUpdate.bind(this)
+  }
+
+  get _audio() {
+    return document.querySelector<HTMLAudioElement>('.audio')!
   }
 
   connectedCallback() {
@@ -139,7 +157,7 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
     player.queuePointerIndex.subscribe((pointer) => {
       // pointer is null => no track set for listening
       // however, this is the default value, so I guess the callback should never fire with null value
-      if (!pointer) {
+      if (pointer === null) {
         return
       }
 
@@ -159,22 +177,22 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
   }
 
   addEventListeners() {
-    this.audio.addEventListener('play', () => {
+    this._audio.addEventListener('play', () => {
       // start time tracking
       requestAnimationFrame(this.trackTimeUpdate)
     })
 
-    this.audio.addEventListener('pause', () => {
+    this._audio.addEventListener('pause', () => {
       // stop time tracking
       this.tracking = false
     })
 
-    this.audio.addEventListener('ended', (e) => {
+    this._audio.addEventListener('ended', (e) => {
       console.log(e)
     })
 
     // changing track
-    this.audio.addEventListener('durationchange', (e) => {
+    this._audio.addEventListener('durationchange', (e) => {
       console.log(e)
     })
   }
@@ -188,9 +206,9 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
     }
 
     this.player = new shaka.Player()
-    await this.player.attach(this.audio)
+    await this.player.attach(this._audio)
 
-    this.castProxy = new shaka.cast.CastProxy(this.audio, this.player, Constants.PRESENTATION_ID)
+    this.castProxy = new shaka.cast.CastProxy(this._audio, this.player, Constants.PRESENTATION_ID)
     this.remoteAudio = this.castProxy.getVideo()
     this.remotePlayer = this.castProxy.getPlayer()
 
@@ -233,7 +251,7 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
   }
 
   seek(time: number) {
-    this.remoteAudio!.currentTime = time
+    this._audio.currentTime = time
   }
 
   onPlayPauseClick() {
@@ -246,13 +264,38 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
   }
 
   onPrevClick() {
-    const currentTime = this.audio!.currentTime
+    const currentTime = this._audio!.currentTime
 
     // if media has been listened for more than 2 seconds, go back to the beginning
     if (currentTime > 2) {
       this.seek(0)
       return
     }
+
+    setPrevTrack()
+  }
+
+  onNextClick() {
+    setNextTrack()
+  }
+
+  onSeekBackwardClick() {
+    this._audio.currentTime = Math.max(0, this._audio.currentTime - this.skipTime)
+  }
+
+  onSeekForwardClick() {
+    this._audio.currentTime = Math.min(
+      this._audio.duration,
+      this._audio.currentTime + this.skipTime
+    )
+  }
+
+  onRepeatClick() {
+    player.status.repeat.value = !player.status.repeat.value
+  }
+
+  onShuffleClick() {
+    toggleShuffle(!player.status.shuffle.value)
   }
 
   trackTimeUpdate() {
@@ -264,7 +307,7 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
     requestAnimationFrame(this.trackTimeUpdate)
 
     // update current time signal
-    const { currentTime } = this.audio
+    const { currentTime } = this._audio
     setCurrentTime(currentTime)
   }
 
@@ -274,8 +317,47 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
       : html`<img src="/resources/assets/svg/play.svg" alt="play" />`
   }
 
+  renderRepeatSVG() {
+    const repeat = player.status.repeat.value
+
+    return html`
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000">
+        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+        <g id="SVGRepo_iconCarrier">
+          <path
+            d="M17 2L21 6M21 6L17 10M21 6H7.8C6.11984 6 5.27976 6 4.63803 6.32698C4.07354 6.6146 3.6146 7.07354 3.32698 7.63803C3 8.27976 3 9.11984 3 10.8V11M3 18H16.2C17.8802 18 18.7202 18 19.362 17.673C19.9265 17.3854 20.3854 16.9265 20.673 16.362C21 15.7202 21 14.8802 21 13.2V13M3 18L7 22M3 18L7 14"
+            stroke="${repeat ? '#1d54d6' : '#FFF'}"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></path>
+        </g>
+      </svg>
+    `
+  }
+
+  renderShuffleSVG() {
+    const shuffle = player.status.shuffle.value
+
+    return html`
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+        <g id="SVGRepo_iconCarrier">
+          <path
+            d="M18 15L21 18M21 18L18 21M21 18H18.5689C17.6297 18 17.1601 18 16.7338 17.8705C16.3564 17.7559 16.0054 17.5681 15.7007 17.3176C15.3565 17.0348 15.096 16.644 14.575 15.8626L14.3333 15.5M18 3L21 6M21 6L18 9M21 6H18.5689C17.6297 6 17.1601 6 16.7338 6.12945C16.3564 6.24406 16.0054 6.43194 15.7007 6.68236C15.3565 6.96523 15.096 7.35597 14.575 8.13744L9.42496 15.8626C8.90398 16.644 8.64349 17.0348 8.29933 17.3176C7.99464 17.5681 7.64357 17.7559 7.2662 17.8705C6.83994 18 6.37033 18 5.43112 18H3M3 6H5.43112C6.37033 6 6.83994 6 7.2662 6.12945C7.64357 6.24406 7.99464 6.43194 8.29933 6.68236C8.64349 6.96523 8.90398 7.35597 9.42496 8.13744L9.66667 8.5"
+            stroke="${shuffle ? '#1d54d6' : '#FFF'}"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></path>
+        </g>
+      </svg>
+    `
+  }
+
   render() {
-    console.log('rendering')
     return html`
       <div class='player__track-infos'>
         <img class="player__track-cover" src=${this.cdn}/${ifDefined(this.currentTrack?.coverUrl)} alt="cover"/>
@@ -286,26 +368,26 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
       </div>
       <div class="player__controls-wrapper">
         <div class='player__controls'>
-          <button class="player__shuffle">
-            <img src='/resources/assets/svg/shuffle.svg' alt="shuffle"/>
+          <button class="player__shuffle" @click="${this.onShuffleClick}">
+            <div>${this.renderShuffleSVG()}</div>
           </button>
-          <button class="player__seek_backward">
+          <button class="player__seek_backward" @click="${this.onSeekBackwardClick}">
             <img src='/resources/assets/svg/seek_backward.svg' alt="seek backward"/>
           </button>
-          <button class="player__previous" @click="${this.onPrevClick}">
+          <button class="player__previous" @click="${this.onPrevClick}" ?disabled="${!player.active.value}">
             <img src='/resources/assets/svg/previous.svg' alt="previous"/>
           </button>
-          <button class="player__play" @click="${this.onPlayPauseClick}">
+          <button class="player__play" @click="${this.onPlayPauseClick}" ?disabled="${!player.active.value}">
             ${this.renderPlayPause()}
           </button>
-          <button class="player__next">
+          <button class="player__next" @click="${this.onNextClick}" ?disabled="${!player.active.value}">
             <img src='/resources/assets/svg/next.svg' alt="next"/>
           </button>
-          <button class="player__seek_forward">
+          <button class="player__seek_forward" @click="${this.onSeekForwardClick}">
             <img src='/resources/assets/svg/seek_forward.svg' alt="seek forward"/>
           </button>
-          <button class="player__repeat">
-            <img src='/resources/assets/svg/repeat.svg' alt="repeat"/>
+          <button class="player__repeat" @click="${this.onRepeatClick}">
+            ${this.renderRepeatSVG()}
           </button>
         </div>
         <stw-progress class='player__progress-bar progress-bar'></stw-progress>
