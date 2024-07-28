@@ -30,9 +30,10 @@ export default function UserLayout(props: Props) {
             <NavBar user={user} />
             <div class={'flex'}>
               <SideNav user={user} />
-              {children}
+              <div class="main-content">{children}</div>
             </div>
             <stw-player class="player" cdn={env.get('CDN_URL')}></stw-player>
+            <audio class="audio" preload="metadata" />
           </div>
         </body>
       </html>

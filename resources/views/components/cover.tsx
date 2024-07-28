@@ -11,7 +11,7 @@ export default function Cover(props: Props) {
   const { id, title, artist, coverUrl, primaryColorR, primaryColorG, primaryColorB } = album
   return (
     <div class="cover">
-      <a href={`/album/${id}`} class="cover__link" up-target={'.tracklist'}>
+      <a href={`/album/${id}`} class="cover__link" up-target={'.main-content'}>
         {/* cover__artwork class is useful for lazy-loading */}
         <section
           class="cover__artwork-container"
