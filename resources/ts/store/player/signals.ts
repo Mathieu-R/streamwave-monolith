@@ -12,7 +12,7 @@ const player = {
   queuePointerIndex: signal<number | null>(null),
   active: signal(false),
   currentTrack: signal<Track | null>(null),
-  currentTime: signal(0),
+  currentTime: signal(null),
   status: {
     playing: signal(false),
     repeat: signal(false),

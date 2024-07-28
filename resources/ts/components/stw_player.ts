@@ -1,12 +1,12 @@
 import { LitElement, html, css } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
 import { ifDefined } from 'lit/directives/if-defined.js'
-import { SignalWatcher, effect } from '@lit-labs/preact-signals'
+import { SignalWatcher } from '@lit-labs/preact-signals'
 // @ts-expect-error
 import shaka from 'shaka-player'
 
 import player from '../store/player/signals.js'
-import { switchPlayingStatus } from '../store/player/mutations.js'
+import { setCurrentTime, switchPlayingStatus } from '../store/player/mutations.js'
 
 import Constants from '../constants.js'
 
@@ -103,6 +103,12 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
   @property({ type: Object })
   remotePlayer: shaka.Player | null
 
+  @property({ type: Boolean })
+  tracking: boolean
+
+  @property()
+  audio: HTMLAudioElement
+
   @state()
   currentTrack: Track | null
 
@@ -116,17 +122,23 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
     this.remotePlayer = null
 
     this.currentTrack = null
+    this.tracking = false
+    this.audio = document.querySelector('.audio')!
 
     this.trackTimeUpdate = this.trackTimeUpdate.bind(this)
   }
 
-  // called when shadow dom is first rendered
-  firstUpdated() {
-    console.log('PLAYER: first render')
-    this.initShakaPlayer()
+  connectedCallback() {
+    super.connectedCallback()
 
-    // listen to queue point index changes
+    this.initShakaPlayer().then(() => {
+      this.addEventListeners()
+    })
+
+    // listen to queue pointer index changes
     player.queuePointerIndex.subscribe((pointer) => {
+      // pointer is null => no track set for listening
+      // however, this is the default value, so I guess the callback should never fire with null value
       if (!pointer) {
         return
       }
@@ -146,8 +158,25 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
     })
   }
 
-  get audio() {
-    return this.shadowRoot!.querySelector('.audio') as HTMLAudioElement
+  addEventListeners() {
+    this.audio.addEventListener('play', () => {
+      // start time tracking
+      requestAnimationFrame(this.trackTimeUpdate)
+    })
+
+    this.audio.addEventListener('pause', () => {
+      // stop time tracking
+      this.tracking = false
+    })
+
+    this.audio.addEventListener('ended', (e) => {
+      console.log(e)
+    })
+
+    // changing track
+    this.audio.addEventListener('durationchange', (e) => {
+      console.log(e)
+    })
   }
 
   async initShakaPlayer() {
@@ -164,9 +193,6 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
     this.castProxy = new shaka.cast.CastProxy(this.audio, this.player, Constants.PRESENTATION_ID)
     this.remoteAudio = this.castProxy.getVideo()
     this.remotePlayer = this.castProxy.getPlayer()
-
-    // track time update
-    requestAnimationFrame(this.trackTimeUpdate)
 
     // player accessible anywhere
     // @ts-expect-error
@@ -206,25 +232,6 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
     this.remoteAudio?.pause()
   }
 
-  trackTimeUpdate() {
-    if (!this.remoteAudio) {
-      return
-    }
-
-    const { duration, currentTime: remoteAudioCurrentTime } = this.remoteAudio
-    requestAnimationFrame(this.trackTimeUpdate)
-
-    if (!duration) {
-      return
-    }
-
-    if (this.remoteAudio.paused) {
-      return
-    }
-
-    player.currentTime.value = Math.floor(remoteAudioCurrentTime)
-  }
-
   seek(time: number) {
     this.remoteAudio!.currentTime = time
   }
@@ -248,6 +255,19 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
     }
   }
 
+  trackTimeUpdate() {
+    if (this.tracking) {
+      return
+    }
+
+    // recursively call this function for 60fps track time update
+    requestAnimationFrame(this.trackTimeUpdate)
+
+    // update current time signal
+    const { currentTime } = this.audio
+    setCurrentTime(currentTime)
+  }
+
   renderPlayPause() {
     return player.status.playing.value
       ? html`<img src="/resources/assets/svg/pause.svg" alt="pause" />`
@@ -255,6 +275,7 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
   }
 
   render() {
+    console.log('rendering')
     return html`
       <div class='player__track-infos'>
         <img class="player__track-cover" src=${this.cdn}/${ifDefined(this.currentTrack?.coverUrl)} alt="cover"/>
@@ -296,7 +317,6 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
         </button>
         <stw-volume class="player__volume"></stw-volume>
       </div>
-      <audio class="audio" preload="metadata"/>
     `
   }
 }

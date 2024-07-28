@@ -29,3 +29,7 @@ export const switchPlayingStatus = () => {
   const playing = player.status.playing
   playing.value = !playing.value
 }
+
+export const setCurrentTime = (currentTime: number) => {
+  player.currentTime.value = currentTime
+}

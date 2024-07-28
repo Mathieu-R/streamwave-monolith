@@ -1,8 +1,8 @@
 import { css, html, LitElement } from 'lit'
-import { customElement } from 'lit/decorators.js'
+import { customElement, state } from 'lit/decorators.js'
 import { classMap } from 'lit/directives/class-map.js'
 import player from '../store/player/signals.js'
-import { SignalWatcher, effect } from '@lit-labs/preact-signals'
+import { SignalWatcher } from '@lit-labs/preact-signals'
 import { formatDuration } from '#ts/helpers'
 
 @customElement('stw-progress')
@@ -99,11 +99,15 @@ export default class STWProgress extends SignalWatcher(LitElement) {
   private bcr: null | DOMRect
   private dragging: boolean
 
+  @state()
+  private currentTimeFormatted: string | null
+
   constructor() {
     super()
 
     this.bcr = null
     this.dragging = false
+    this.currentTimeFormatted = null
 
     this.onResize = this.onResize.bind(this)
     this.updatePosition = this.updatePosition.bind(this)
@@ -116,19 +120,23 @@ export default class STWProgress extends SignalWatcher(LitElement) {
   // because we need to know its BCR properties
   // strangely @query doesn't work
   get _progressBar() {
-    return this.renderRoot?.querySelector('.progress-bar') ?? null
+    return this.renderRoot?.querySelector<HTMLElement>('.progress-bar') ?? null
   }
 
   get _trackUsed() {
-    return this.renderRoot?.querySelector('.progress-bar__track-used') ?? null
+    return this.renderRoot?.querySelector<HTMLElement>('.progress-bar__track-used') ?? null
   }
 
   get _seekerContainer() {
-    return this.renderRoot?.querySelector('.progress-bar__seeker-container') ?? null
+    return this.renderRoot?.querySelector<HTMLElement>('.progress-bar__seeker-container') ?? null
   }
 
   get _seeker() {
-    return this.renderRoot?.querySelector('.progress-bar__seeker') ?? null
+    return this.renderRoot?.querySelector<HTMLElement>('.progress-bar__seeker') ?? null
+  }
+
+  get _audio() {
+    return document.querySelector<HTMLAudioElement>('audio')!
   }
 
   connectedCallback() {
@@ -139,26 +147,48 @@ export default class STWProgress extends SignalWatcher(LitElement) {
     document.addEventListener('mousemove', this.onSwipeMove, { passive: true })
     document.addEventListener('mouseup', this.onSwipeEnd, { passive: true })
     window.addEventListener('resize', this.onResize)
+
+    this.trackSignalChanges()
+  }
+
+  trackSignalChanges() {
+    player.currentTime.subscribe((currentTime) => {
+      // shadow dom not rendered yet
+      if (!this._trackUsed) {
+        return
+      }
+
+      // avoid audio element updating the UI if we are dragging the seeker
+      // while we are listening to a track
+      if (this.dragging) {
+        return
+      }
+
+      this.currentTimeFormatted = formatDuration(currentTime)
+
+      const positionX = currentTime / this._audio.duration
+      this.updateUI(positionX)
+    })
   }
 
   firstUpdated() {
     this.onResize()
   }
 
-  updated(updatedProperties) {
+  /*updated(updatedProperties) {
     // no track set
     if (!player.currentTrack.value) {
       return
     }
     const position = player.currentTime.value / player.currentTrack.value.duration!
     requestAnimationFrame(() => this.updateUI(position))
-  }
+  }*/
 
   onResize() {
     this.bcr = this._progressBar!.getBoundingClientRect()
   }
 
-  findCandidate(evt: TouchEvent) {
+  findCandidate(evt: TouchEvent | MouseEvent) {
     if (evt.touches && evt.touches.length) {
       return evt.touches[0]
     }
@@ -203,7 +233,7 @@ export default class STWProgress extends SignalWatcher(LitElement) {
     this.dragging = false
     this._seeker!.classList.remove('progress-bar__seeker--active')
 
-    player.currentTime.value = this.updatePosition(evt)
+    this._audio.currentTime = this.updatePosition(evt)
   }
 
   updatePosition(evt: TouchEvent | MouseEvent) {
@@ -217,14 +247,13 @@ export default class STWProgress extends SignalWatcher(LitElement) {
     const clampedPositionX = Math.max(0, Math.min(relativePositionX, 1))
 
     requestAnimationFrame(() => this.updateUI(clampedPositionX))
-
     // get the current time from the clamped position
-    return Math.floor(clampedPositionX * player.currentTrack.value.duration!)
+    return Math.floor(clampedPositionX * this._audio.duration)
   }
 
-  updateUI(clampedPositionX: number) {
-    this._trackUsed!.style.transform = `translate(-50%, -50%) scale(${clampedPositionX})`
-    this._seekerContainer!.style.transform = `translateX(${clampedPositionX * 100}%)`
+  updateUI(normalizedPositionX: number) {
+    this._trackUsed!.style.transform = `translate(-50%, -50%) scale(${normalizedPositionX})`
+    this._seekerContainer!.style.transform = `translateX(${normalizedPositionX * 100}%)`
   }
 
   disconnectedCallback() {
@@ -240,7 +269,7 @@ export default class STWProgress extends SignalWatcher(LitElement) {
     return html`
       <div class="wrapper" @mousedown="${this.onSwipeStart}" @touchstart="${this.onSwipeStart}">
         <div class="player__current_time">
-          ${player.active.value ? formatDuration(player.currentTime.value) : ''}
+          ${this.currentTimeFormatted ? this.currentTimeFormatted : ''}
         </div>
         <div class="progress-bar ${classMap({ 'progress-bar--disabled': !player.active.value })}">
           <div class="progress-bar__track"></div>
