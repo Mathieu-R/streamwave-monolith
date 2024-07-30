@@ -35,7 +35,7 @@ const currentTrack = computed(() => {
   }
 
   const trackId = queue[pointer]
-  return player.tracklist.value!.get(trackId)
+  return { id: trackId, ...player.tracklist.value!.get(trackId) }
 })
 
 export default {

@@ -8,6 +8,7 @@ declare global {
       ['stw-player']: HtmlTag
       ['stw-progress']: HtmlTag
       ['stw-volume']: HtmlTag
+      ['stw-settings']: HtmlTag
     }
 
     interface HtmlTag {
@@ -20,6 +21,7 @@ declare global {
 
       // custom elements
       ['cdn']?: string
+      ['userid']?: string
     }
 
     interface HtmlAnchorTag {

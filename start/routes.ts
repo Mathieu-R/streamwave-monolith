@@ -9,6 +9,7 @@
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+const SettingsController = () => import('../app/settings/settings_controller.js')
 
 const LocalSignUpController = () => import('../app/auth/controllers/local_sign_up_controller.js')
 const LocalSignInController = () => import('../app/auth/controllers/local_sign_in_controller.js')
@@ -53,6 +54,7 @@ router
   .group(() => {
     router.get('/', [HomeController, 'index']).as('home')
     router.get('/album/:id', [AlbumController, 'index']).as('album')
+    router.get('/settings', [SettingsController, 'index']).as('settings')
 
     router.post('/logout', [CommonAuthController, 'logout']).as('auth.logout')
   })

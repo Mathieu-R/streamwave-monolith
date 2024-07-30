@@ -2,6 +2,7 @@ export interface Track {
   index: number
   title: string
   artist: string
+  album: string
   duration: number
   coverUrl: string
   manifest: string

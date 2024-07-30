@@ -1,19 +1,15 @@
 import { css, html, LitElement } from 'lit'
-import { customElement, state } from 'lit/decorators.js'
-import { classMap } from 'lit/directives/class-map.js'
-import player from '../store/player/signals.js'
-import { SignalWatcher } from '@lit-labs/preact-signals'
-import { formatDuration } from '#ts/helpers'
+import { customElement, property } from 'lit/decorators.js'
 
-@customElement('stw-progress')
-export default class STWProgress extends SignalWatcher(LitElement) {
+@customElement('stw-slider')
+export default class STWSlider extends LitElement {
   static styles = css`
     :host {
       display: flex;
       align-items: center;
       flex: 1;
       height: 100%;
-      --progress-bar-height: 5px;
+      --slider-height: 5px;
     }
 
     .wrapper {
@@ -25,13 +21,7 @@ export default class STWProgress extends SignalWatcher(LitElement) {
       height: 100%;
     }
 
-    .player__current_time,
-    .player__total_time {
-      width: 30px;
-      font-size: 12px;
-    }
-
-    .progress-bar {
+    .slider {
       position: relative;
       display: flex;
       align-items: center;
@@ -40,26 +30,22 @@ export default class STWProgress extends SignalWatcher(LitElement) {
       border-radius: 5px;
     }
 
-    .progress-bar--disabled {
-      opacity: 0;
-    }
-
-    .progress-bar__track {
+    .slider__track {
       position: absolute;
       top: 50%;
       left: 50%;
-      height: var(--progress-bar-height);
+      height: var(--slider-height);
       width: 100%;
       transform: translate(-50%, -50%);
       background: rgba(255, 255, 255, 0.5);
     }
 
-    .progress-bar__track-used {
+    .slider__track-used {
       position: absolute;
       top: 50%;
       left: 50%;
       width: 100%;
-      height: var(--progress-bar-height);
+      height: var(--slider-height);
       background: #fff;
       border-radius: 5px;
       transform: translate(-50%, -50%) scale(0);
@@ -67,16 +53,17 @@ export default class STWProgress extends SignalWatcher(LitElement) {
       will-change: transform;
     }
 
-    .progress-bar__seeker-container {
+    .slider__seeker-container {
       position: relative;
       width: 100%;
+      height: var(--slider-height);
       background: 0 0;
       border: none;
       outline: none;
       pointer-events: none;
     }
 
-    .progress-bar__seeker {
+    .slider__seeker {
       position: absolute;
       top: 50%;
       left: -12px;
@@ -91,23 +78,23 @@ export default class STWProgress extends SignalWatcher(LitElement) {
       will-change: transform;
     }
 
-    .progress-bar__seeker--active {
+    .slider__seeker--active {
       box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.2);
       transform: translateY(-50%) scale(1);
     }
   `
+
+  @property({ type: Number })
+  defaultvalue = 0
+
   private bcr: null | DOMRect
   private dragging: boolean
-
-  @state()
-  private currentTimeFormatted: string | null
 
   constructor() {
     super()
 
     this.bcr = null
     this.dragging = false
-    this.currentTimeFormatted = null
 
     this.onResize = this.onResize.bind(this)
     this.updatePosition = this.updatePosition.bind(this)
@@ -119,24 +106,20 @@ export default class STWProgress extends SignalWatcher(LitElement) {
   // reference to the progress bar element
   // because we need to know its BCR properties
   // strangely @query doesn't work
-  get _progressBar() {
-    return this.renderRoot?.querySelector<HTMLElement>('.progress-bar') ?? null
+  get _slider() {
+    return this.renderRoot?.querySelector<HTMLElement>('.slider') ?? null
   }
 
   get _trackUsed() {
-    return this.renderRoot?.querySelector<HTMLElement>('.progress-bar__track-used') ?? null
+    return this.renderRoot?.querySelector<HTMLElement>('.slider__track-used') ?? null
   }
 
   get _seekerContainer() {
-    return this.renderRoot?.querySelector<HTMLElement>('.progress-bar__seeker-container') ?? null
+    return this.renderRoot?.querySelector<HTMLElement>('.slider__seeker-container') ?? null
   }
 
   get _seeker() {
-    return this.renderRoot?.querySelector<HTMLElement>('.progress-bar__seeker') ?? null
-  }
-
-  get _audio() {
-    return document.querySelector<HTMLAudioElement>('audio')!
+    return this.renderRoot?.querySelector<HTMLElement>('.slider__seeker') ?? null
   }
 
   connectedCallback() {
@@ -147,36 +130,17 @@ export default class STWProgress extends SignalWatcher(LitElement) {
     document.addEventListener('mousemove', this.onSwipeMove, { passive: true })
     document.addEventListener('mouseup', this.onSwipeEnd, { passive: true })
     window.addEventListener('resize', this.onResize)
-
-    this.trackSignalChanges()
-  }
-
-  trackSignalChanges() {
-    player.currentTime.subscribe((currentTime) => {
-      // shadow dom not rendered yet
-      if (!this._trackUsed) {
-        return
-      }
-
-      // avoid audio element updating the UI if we are dragging the seeker
-      // while we are listening to a track
-      if (this.dragging) {
-        return
-      }
-
-      this.currentTimeFormatted = formatDuration(currentTime)
-
-      const positionX = currentTime / this._audio.duration
-      this.updateUI(positionX)
-    })
   }
 
   firstUpdated() {
     this.onResize()
+    this.updateUI(Number.parseInt(this.defaultvalue))
   }
 
   onResize() {
-    this.bcr = this._progressBar!.getBoundingClientRect()
+    // TODO: FIX bcr is not right
+    this.bcr = this._slider!.getBoundingClientRect()
+    console.log(this.bcr.width, this.bcr.left)
   }
 
   findCandidate(evt: TouchEvent | MouseEvent) {
@@ -194,14 +158,10 @@ export default class STWProgress extends SignalWatcher(LitElement) {
   onSwipeStart(evt: TouchEvent | MouseEvent) {
     evt.stopPropagation()
 
-    if (!player.active.value) {
-      return
-    }
-
     // focus on seeker element
     this._seekerContainer!.focus()
     this.dragging = true
-    this._seeker!.classList.add('progress-bar__seeker--active')
+    this._seeker!.classList.add('slider__seeker--active')
   }
 
   onSwipeMove(evt: TouchEvent | MouseEvent) {
@@ -222,9 +182,13 @@ export default class STWProgress extends SignalWatcher(LitElement) {
     }
 
     this.dragging = false
-    this._seeker!.classList.remove('progress-bar__seeker--active')
+    this._seeker!.classList.remove('slider__seeker--active')
 
-    this._audio.currentTime = this.updatePosition(evt)
+    const clampedPosition = this.updatePosition(evt)
+
+    if (clampedPosition !== undefined) {
+      this.dispatchEvent(new CustomEvent('seek', { detail: { position: clampedPosition } }))
+    }
   }
 
   updatePosition(evt: TouchEvent | MouseEvent) {
@@ -237,12 +201,15 @@ export default class STWProgress extends SignalWatcher(LitElement) {
     // ensure we do not go outside the progress bar
     const clampedPositionX = Math.max(0, Math.min(relativePositionX, 1))
 
+    // update UI
     requestAnimationFrame(() => this.updateUI(clampedPositionX))
-    // get the current time from the clamped position
-    return Math.floor(clampedPositionX * this._audio.duration)
+
+    // return clamped position
+    return clampedPositionX
   }
 
   updateUI(normalizedPositionX: number) {
+    console.log(normalizedPositionX)
     this._trackUsed!.style.transform = `translate(-50%, -50%) scale(${normalizedPositionX})`
     this._seekerContainer!.style.transform = `translateX(${normalizedPositionX * 100}%)`
   }
@@ -258,19 +225,11 @@ export default class STWProgress extends SignalWatcher(LitElement) {
 
   protected render() {
     return html`
-      <div class="wrapper" @mousedown="${this.onSwipeStart}" @touchstart="${this.onSwipeStart}">
-        <div class="player__current_time">
-          ${this.currentTimeFormatted ? this.currentTimeFormatted : ''}
-        </div>
-        <div class="progress-bar ${classMap({ 'progress-bar--disabled': !player.active.value })}">
-          <div class="progress-bar__track"></div>
-          <div class="progress-bar__track-used"></div>
-          <div class="progress-bar__seeker-container">
-            <div class="progress-bar__seeker"></div>
-          </div>
-        </div>
-        <div class="player__total_time">
-          ${player.currentTrack.value ? formatDuration(player.currentTrack.value.duration!) : ''}
+      <div class="slider" @mousedown="${this.onSwipeStart}" @touchstart="${this.onSwipeStart}">
+        <div class="slider__track"></div>
+        <div class="slider__track-used"></div>
+        <div class="slider__seeker-container">
+          <div class="slider__seeker"></div>
         </div>
       </div>
     `

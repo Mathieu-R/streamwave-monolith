@@ -32,7 +32,12 @@ export default function SideNav(props: Props) {
           </a>
         </li>
         <li class="side-nav__element">
-          <a class="side-nav__link" href="/playlists" aria-label="playlists">
+          <a
+            class="side-nav__link"
+            href="/playlists"
+            up-target={'.main-content'}
+            aria-label="playlists"
+          >
             <Vite.Image
               class={'side-nav__link-icon'}
               src="resources/assets/svg/playlist.svg"
@@ -42,7 +47,7 @@ export default function SideNav(props: Props) {
           </a>
         </li>
         <li class="side-nav__element">
-          <a class="side-nav__link" href="/search" aria-label="search">
+          <a class="side-nav__link" href="/search" up-target={'.main-content'} aria-label="search">
             <Vite.Image
               class={'side-nav__link-icon'}
               src="resources/assets/svg/search.svg"
@@ -52,7 +57,7 @@ export default function SideNav(props: Props) {
           </a>
         </li>
         <li class="side-nav__element">
-          <a class="side-nav__link" href="/upload" aria-label="upload">
+          <a class="side-nav__link" href="/upload" up-target={'.main-content'} aria-label="upload">
             <Vite.Image
               class={'side-nav__link-icon'}
               src="resources/assets/svg/cloud_upload.svg"
@@ -62,7 +67,13 @@ export default function SideNav(props: Props) {
           </a>
         </li>
         <li class="side-nav__element">
-          <a class="side-nav__link" href="/settings" aria-label="settings">
+          <a
+            class="side-nav__link"
+            href="/settings"
+            up-follow
+            up-target={'.main-content'}
+            aria-label="settings"
+          >
             <Vite.Image
               class={'side-nav__link-icon'}
               src="resources/assets/svg/settings.svg"

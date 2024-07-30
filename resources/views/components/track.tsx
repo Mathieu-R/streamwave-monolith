@@ -3,12 +3,13 @@ import { formatDuration } from '#ts/helpers'
 interface Props {
   index: number
   track: any
+  album: string
   coverUrl: string
   type: string
 }
 
 export default function Track(props: Props) {
-  const { index, track, coverUrl, type } = props
+  const { index, track, album, coverUrl, type } = props
   return (
     <stw-track
       class={'track'}
@@ -16,6 +17,7 @@ export default function Track(props: Props) {
       trackid={track.id}
       title={track.title}
       artist={track.artist}
+      album={album}
       number={track.number}
       duration={track.duration}
       coverUrl={coverUrl}

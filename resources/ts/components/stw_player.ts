@@ -8,16 +8,17 @@ import shaka from 'shaka-player'
 import player from '../store/player/signals.js'
 import {
   setCurrentTime,
-  switchPlayingStatus,
   setPrevTrack,
   setNextTrack,
   toggleShuffle,
+  setPlayingStatus,
 } from '../store/player/mutations.js'
 
+import { Track } from '#types/signals'
 import Constants from '../constants.js'
 
 import './stw_progress.js'
-import { Track } from '#types/signals'
+import './stw_volume.js'
 
 @customElement('stw-player')
 export default class STWPlayer extends SignalWatcher(LitElement) {
@@ -104,6 +105,9 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
   @property({ type: String })
   cdn!: string
 
+  @property({ type: Number })
+  userid!: number
+
   @property({ type: Object })
   player: shaka.Player | null
 
@@ -150,20 +154,18 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
     super.connectedCallback()
 
     this.initShakaPlayer().then(() => {
+      // media session API
+      this.initMediaSession()
       this.addEventListeners()
     })
 
     // listen to queue pointer index changes
-    player.queuePointerIndex.subscribe((pointer) => {
+    player.currentTrack.subscribe((track) => {
       // pointer is null => no track set for listening
       // however, this is the default value, so I guess the callback should never fire with null value
-      if (pointer === null) {
+      if (!track) {
         return
       }
-
-      const queue = player.queue.value
-      const trackId = queue[pointer]
-      const track = player.tracklist.value!.get(trackId)!
 
       this.listen(track, true)
         .then(() => {
@@ -188,6 +190,7 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
     })
 
     this._audio.addEventListener('ended', (e) => {
+      setNextTrack()
       console.log(e)
     })
 
@@ -227,6 +230,37 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
     })
   }
 
+  initMediaSession() {
+    if (!Constants.SUPPORT_MEDIA_SESSION_API) {
+      return
+    }
+
+    navigator.mediaSession.setActionHandler('play', (_) => {
+      setPlayingStatus(true)
+      this.play()
+    })
+    navigator.mediaSession.setActionHandler('pause', (_) => {
+      setPlayingStatus(false)
+      this.pause()
+    })
+    navigator.mediaSession.setActionHandler('seekbackward', this.onSeekBackwardClick)
+    navigator.mediaSession.setActionHandler('seekforward', this.onSeekForwardClick)
+    navigator.mediaSession.setActionHandler('previoustrack', this.onPrevClick)
+    navigator.mediaSession.setActionHandler('nexttrack', this.onNextClick)
+  }
+
+  setMediaNotifications(title: string, artist: string, album: string, coverUrl: string) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: title,
+      artist: artist,
+      album: album,
+      artwork: [
+        { src: `${this.cdn}/${coverUrl}`, sizes: '256x256', type: 'image/png' },
+        { src: `${this.cdn}/${coverUrl}`, sizes: '512x512', type: 'image/png' },
+      ],
+    })
+  }
+
   initWebAudioApi() {}
 
   async listen(track: Track, play: boolean) {
@@ -234,20 +268,24 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
       return
     }
 
+    // load track
     await this.remotePlayer.load(`${this.cdn}/${track.manifest}`)
-
     console.log(`[shaka-player] Music loaded: ${track.manifest}`)
-    return play ? await this.play() : await this.pause()
 
-    // TODO: media session notification
+    play ? await this.play() : this.pause()
+
+    // set media notifications if supported
+    if (Constants.SUPPORT_MEDIA_SESSION_API) {
+      this.setMediaNotifications(track.title, track.artist, track.album, track.coverUrl)
+    }
   }
 
   play() {
-    this.remoteAudio?.play()
+    return this.remoteAudio?.play()
   }
 
   pause() {
-    this.remoteAudio?.pause()
+    return this.remoteAudio?.pause()
   }
 
   seek(time: number) {
@@ -258,7 +296,7 @@ export default class STWPlayer extends SignalWatcher(LitElement) {
     const isPlaying = player.status.playing.value
 
     // switch playing status
-    switchPlayingStatus()
+    setPlayingStatus(!isPlaying)
 
     isPlaying ? this.pause() : this.play()
   }

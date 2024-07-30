@@ -26,9 +26,8 @@ export const setCurrentTrack = (queuePointerIndex: number) => {
   player.status.playing.value = true
 }
 
-export const switchPlayingStatus = () => {
-  const playing = player.status.playing
-  playing.value = !playing.value
+export const setPlayingStatus = (playing: boolean) => {
+  player.status.playing.value = playing
 }
 
 export const setCurrentTime = (currentTime: number) => {

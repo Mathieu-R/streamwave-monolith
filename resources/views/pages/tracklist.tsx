@@ -52,7 +52,13 @@ export default function TrackListPage(props: Props) {
         </section>
         <section class="tracklist__tracks">
           {album.tracks.map((track, idx) => (
-            <Track index={idx} track={track} coverUrl={album.coverUrl} type={type} />
+            <Track
+              index={idx}
+              track={track}
+              album={album.title}
+              coverUrl={album.coverUrl}
+              type={type}
+            />
           ))}
         </section>
       </stw-tracklist>

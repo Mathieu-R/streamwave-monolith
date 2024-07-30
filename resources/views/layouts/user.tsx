@@ -32,7 +32,7 @@ export default function UserLayout(props: Props) {
               <SideNav user={user} />
               <div class="main-content">{children}</div>
             </div>
-            <stw-player class="player" cdn={env.get('CDN_URL')}></stw-player>
+            <stw-player class="player" cdn={env.get('CDN_URL')} userid={user.id}></stw-player>
             <audio class="audio" preload="metadata" />
           </div>
         </body>
